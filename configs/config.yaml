@@ -1,0 +1,126 @@
+# chasi-sreagent configuration file
+# chasi-sreagent 配置文件
+
+# Log settings
+# 日志设置
+log:
+  level: info # Logging level: debug, info, warn, error, fatal, panic
+  # 日志级别: debug, info, warn, error, fatal, panic
+  format: json # Logging format: json or console
+  # 日志格式: json 或 console
+  output: stdout # Logging output: stdout, stderr, or file path
+  # 日志输出: stdout, stderr, 或 文件路径
+
+# Kubernetes connection settings
+# Kubernetes 连接设置
+kubernetes:
+  # Path to the kubeconfig file. If empty, uses in-cluster config or default kubeconfig paths.
+  # kubeconfig 文件路径。如果为空，则使用集群内配置或默认 kubeconfig 路径。
+  kubeconfigPath: ""
+  # List of vcluster contexts or kubeconfig overrides to analyze.
+  # 需要分析的 vcluster 上下文列表或 kubeconfig 覆盖配置。
+  # Each entry can specify a context name from the main kubeconfig, or inline config.
+  # 每个条目可以指定主 kubeconfig 中的上下文名称，或内联配置。
+  vclusters:
+    - name: "vcluster-a"
+      context: "vcluster-a-context" # Kubeconfig context name for vcluster A
+      # vcluster A 的 Kubeconfig 上下文名称
+    - name: "vcluster-b"
+      kubeconfig: |                  # Inline kubeconfig for vcluster B (alternative)
+        apiVersion: v1
+        clusters: ...
+        users: ...
+        contexts: ...
+      # ... other vcluster specific settings like namespace in host cluster ...
+      # ... 其他 vcluster 特定设置，例如在宿主机集群中的 namespace ...
+
+# LLM settings
+# 大模型设置
+llm:
+  provider: "localai" # LLM provider: localai, deepseek, openai, etc.
+  # LLM 提供商: localai, deepseek, openai 等。
+  localai:
+    url: "http://localhost:8080/v1" # LocalAI API endpoint
+    # LocalAI API 端点
+    model: "ggml-model"             # Model name to use
+    # 使用的模型名称
+    apiKey: ""                      # API Key if required (LocalAI might not need one)
+    # API Key (如果需要，LocalAI 可能不需要)
+  deepseek:
+    url: "https://api.deepseek.com/v1" # DeepSeek API endpoint
+    # DeepSeek API 端点
+    model: "deepseek-coder"          # Model name
+    # 模型名称
+    apiKey: "YOUR_DEEPSEEK_API_KEY"  # DeepSeek API Key
+    # DeepSeek API Key
+  # ... other providers ...
+  timeout: 60s # Timeout for LLM API calls
+  # LLM API 调用超时时间
+
+# Knowledge Base (RAG) settings
+# 知识库 (RAG) 设置
+knowledgeBase:
+  enabled: true # Enable RAG knowledge base
+  # 启用 RAG 知识库
+  provider: "vector-db" # KB provider: vector-db, etc.
+  # 知识库提供商: vector-db 等。
+  vectorDB:
+    url: "http://localhost:8123" # Vector database endpoint
+    # 向量数据库端点
+    collection: "sre-knowledge" # Collection/index name
+    # Collection/索引 名称
+    apiKey: "" # API Key if required
+    # API Key (如果需要)
+  embedding:
+    model: "text-embedding-ada-002" # Embedding model for RAG
+    # RAG 使用的 Embedding 模型
+    provider: "openai"              # Embedding model provider (can be different from LLM provider)
+    # Embedding 模型提供商 (可以不同于 LLM 提供商)
+    url: ""                         # Embedding model API endpoint (if different)
+    # Embedding 模型 API 端点 (如果不同)
+    apiKey: ""                      # Embedding model API Key
+    # Embedding 模型 API Key
+
+# Business Adaptation SDK settings
+# 业务适配 SDK 设置
+businessSDK:
+  # How to discover business service endpoints: "kubernetes-service", "static-list"
+  # 如何发现业务服务终点: "kubernetes-service", "static-list"
+  discoveryMethod: "kubernetes-service"
+  # If discoveryMethod is "kubernetes-service", specify service labels or namespaces
+  # 如果 discoveryMethod 是 "kubernetes-service"，指定服务标签或命名空间
+  kubernetesServiceDiscovery:
+    namespaces: ["default", "business-a-ns"] # Namespaces to scan for services with specific labels
+    # 扫描指定标签服务的命名空间
+    selector:                              # Label selector for business services
+      matchLabels:
+        app.chasi.turtacn.com/sre-adaptor: "enabled"
+  # If discoveryMethod is "static-list", provide a list of endpoints
+  # 如果 discoveryMethod 是 "static-list"，提供终点列表
+  staticEndpoints:
+    - name: "business-a"
+      url: "grpc://business-a.business-a-ns.svc.cluster.local:50051"
+    - name: "business-b"
+      url: "http://business-b.business-b-ns.svc.cluster.local/sre/api/v1"
+  timeout: 10s # Timeout for calling business SDK endpoints
+  # 调用业务 SDK 终点的超时时间
+
+# Analysis settings
+# 分析设置
+analysis:
+  # List of analyzers to enable. If empty, all registered analyzers are enabled.
+  # 要启用的分析器列表。如果为空，所有注册的分析器都会被启用。
+  enabledAnalyzers:
+    - "kubernetes-pod-analyzer"
+    - "business-log-analyzer"
+  # Default analysis interval (for continuous analysis)
+  # 默认分析间隔 (用于持续分析)
+  interval: 5m
+
+# Action settings (Optional)
+# 动作设置 (可选)
+actions:
+  enabled: false # Enable automated actions (use with extreme caution!)
+  # 启用自动化动作 (使用时务必极其谨慎!)
+  # ... Action specific configurations ...
+  # ... 动作特定配置 ...
