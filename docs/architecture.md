@@ -35,6 +35,7 @@
 `chasi-sreagent` 采用分层设计，核心围绕数据采集、智能分析、诊断推理和行动建议四大环节构建。整体架构如下图所示：
 
 <img src="images/architecture.png" width="100%" />
+
 **图1: `chasi-sreagent` 总体架构与外部交互**
 
 架构遵循标准的 AI Agent 工作流：感知（数据采集、分析）-> 思考（诊断推理、LLM交互、知识利用）-> 行动（建议、执行）。分层设计使得各组件职责清晰，便于独立开发和测试。核心组件通过明确的接口交互，降低耦合度。
@@ -48,6 +49,7 @@
 在此模式下，`chasi-sreagent` 的核心组件（Agent、Operator、API 服务等）部署在底层的宿主机 Kubernetes 集群中。
 
 <img src="images/deploy-c.png" width="100%" />
+
 **图2: 集中式部署架构**
 
 在这种模式下，Agent 需要具备访问宿主机集群和所有虚拟集群的 K8s API 权限。访问 vCluster API 通常可以通过在 vCluster 中创建具有相应权限的 ServiceAccount，并在宿主机集群的 Agent Pod 中使用该 ServiceAccount 的 Secret 来配置 KubeConfig 实现 [2]。业务数据采集通过业务系统暴露的接口或 Agent 主动拉取（利用业务适配器 SDK 定义的接口）完成。这种模式适用于需要统一视角的运维场景。
@@ -57,6 +59,7 @@
 在此模式下，`chasi-sreagent` 的部分组件（例如数据采集器、业务适配器）可以作为 Sidecar 或 DaemonSet 部署在 vCluster 内部或与业务系统 Pod 协同部署，而核心分析和诊断引擎仍可能运行在宿主机集群或独立的控制平面中。
 
 <img src="images/deploy.png" width="100%" />
+
 **图3: 分布式/融合式部署架构**
 
 在这种模式下，vCluster 内的 Agent 组件负责采集本地的 K8s 数据和业务数据，并将处理后的数据上报给宿主机集群的核心引擎。这降低了跨集群访问的复杂性，提高了数据采集的效率和安全性，也更符合 vCluster 的隔离原则。业务适配器 SDK 可以直接部署为业务 Pod 的 Sidecar。这种模式适用于更强调租户内数据本地化处理和隔离的场景。

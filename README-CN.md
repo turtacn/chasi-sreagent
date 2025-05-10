@@ -5,8 +5,6 @@ English(英文) README [readme-en](README.md).
 
 **AI SRE 智能代理，专为多租户 Kubernetes 环境设计**
 
-![chasi-sreagent Logo Placeholder](docs/images/logo_placeholder.png) %% Placeholder for project logo
-
 ---
 
 ## Introduction / 项目简介

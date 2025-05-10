@@ -3,9 +3,6 @@
 **AI SRE Agent for Multi-tenant Kubernetes Environments**
 
 Chinese(中文) README [readme-cn](README-CN.md).
-
-![chasi-sreagent Logo Placeholder](docs/images/logo_placeholder.png) %% Placeholder for project logo
-
 ---
 
 ## Introduction
